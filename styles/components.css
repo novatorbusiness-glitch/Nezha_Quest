@@ -1,0 +1,32 @@
+.ns-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--glass-radius, 24px);
+  backdrop-filter: blur(var(--glass-blur, 20px));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 20px));
+  box-shadow: 0 0 0 1px var(--glass-border-glow, rgba(118, 205, 255, 0.22));
+  padding: var(--space-4);
+}
+
+.ns-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ns-btn-primary {
+  background: var(--neon-fire);
+  color: #fff;
+}
+
+.ns-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+}

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#070A14">
+    <link rel="manifest" href="manifest.json">
+    <title>NEZHA QUEST: Path Of Honor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto:wght@400;500;600&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/tokens.css?v=20260417v43">
+    <link rel="stylesheet" href="styles/base.css?v=20260417v43">
+    <link rel="stylesheet" href="styles/components.css?v=20260417v43">
+    <link rel="stylesheet" href="styles/screens.css?v=20260417v43">
+    <link rel="stylesheet" href="styles/style.css?v=20260417v43">
+</head>
+<body>
+
+    <header class="orbitron">
+        <div class="brand-title">NEZHA_<span>QUEST</span></div>
+        <div class="brand-subtitle">ПУТЬ ЧЕСТИ • СИСТЕМА ДОДЗЁ</div>
+    </header>
+
+    <div id="night-mode-indicator" class="night-mode-indicator orbitron">
+        ДОДЗЁ ЗАКРЫТО ДО 07:00
+    </div>
+
+    <div id="dojo-lockdown-overlay" class="dojo-lockdown-overlay orbitron" aria-live="polite" aria-modal="true" role="dialog">
+        <div class="dojo-lockdown-panel">
+            <div class="dojo-lock-icon" aria-hidden="true">🔒</div>
+            <h2>ДОДЗЁ ЗАКРЫТО</h2>
+            <p>Время концентрации и отдыха</p>
+            <div id="dojo-lockdown-state" class="dojo-lockdown-state">РЕЖИМ ТИШИНЫ</div>
+            <button class="btn-action dojo-master-access-btn" onclick="openAdmin()">ВХОД МАСТЕРА</button>
+        </div>
+    </div>
+
+    <div id="penalty-overlay">
+        <div class="overlay-content">
+            <h2 id="penalty-title" class="orbitron glow-red">СИСТЕМА ЗАБЛОКИРОВАНА</h2>
+            <p id="penalty-desc" class="penalty-desc">ОБНАРУЖЕНО НАРУШЕНИЕ: ЛОЖЬ / САБОТАЖ.<br>ТРЕБУЕТСЯ ПРИНЯТЬ ПОСЛЕДСТВИЯ ДЛЯ ВОССТАНОВЛЕНИЯ.</p>
+            
+            <div class="wheel-container">
+                <div class="wheel-arrow"></div>
+                <canvas id="penalty-wheel" width="340" height="340"></canvas>
+            </div>
+            
+            <div class="action-zone">
+                <button id="spin-penalty-btn" class="btn-action btn-penalty" onclick="spinPenaltyWheel()">
+                    УЗНАТЬ ПОСЛЕДСТВИЯ
+                </button>
+                <div id="penalty-result" class="orbitron"></div>
+                <div id="penalty-legend" class="wheel-legend"></div>
+                <button id="resolve-btn" class="btn-action btn-fix" onclick="resolvePenalty()">
+                    Я ВЫПОЛНИЛ ШТРАФ
+                </button>
+                <button id="cancel-penalty-btn" class="btn-action btn-cancel-penalty" onclick="cancelPenaltyProtocol()">
+                    НАЗАД
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="pin-screen">
+        <div class="pin-box">
+            <h3 class="orbitron">ДОСТУП МАСТЕРА</h3>
+            <p>ВВЕДИТЕ PIN-КОД ДЛЯ ВХОДА В АДМИНКУ</p>
+            <input type="password" id="pin-field" class="pin-input" maxlength="4" placeholder="••••" oninput="checkPIN()">
+            <p id="pin-error" class="pin-error" aria-live="polite"></p>
+            <button class="btn-action btn-cancel" onclick="closeAdmin()">ОТМЕНА</button>
+        </div>
+    </div>
+
+    <main class="main-content">
+
+        <section id="tab-dashboard" class="tab-content active">
+            <div class="glass-card main-profile">
+                <div class="profile-header">
+                    <div class="avatar-container">
+                        <div class="avatar-ring">
+                            <div class="avatar-inner" id="hero-avatar">
+                                </div>
+                        </div>
+                    </div>
+                    <div class="profile-info">
+                        <h2 class="orbitron" id="hero-name">АРТЕМ</h2>
+                        <div class="level-badge orbitron" id="level-txt" style="display:inline-block;">УРОВЕНЬ 1</div>
+                        <button type="button" class="btn-action rules-trigger" onclick="document.getElementById('rules-overlay').classList.add('active');">[❓] ПРАВИЛА</button>
+                    </div>
+                </div>
+
+                <div id="evolution-panel" class="evolution-panel stage-chaos">
+                    <div class="evolution-head">
+                        <span class="stat-title">ПУТЬ ОТ ХАОСА К ПОРЯДКУ</span>
+                        <span id="evolution-stage-label" class="evolution-stage orbitron">БАЗА • 1-5</span>
+                    </div>
+                    <div class="evolution-bar-bg">
+                        <div id="evolution-bar-fill" class="evolution-bar-fill"></div>
+                    </div>
+                    <div class="evolution-meta">
+                        <span id="evolution-level-text">Путь от хаоса к порядку: 1/20</span>
+                        <span id="habits-defeated-text">Привычек побеждено: 0/20</span>
+                    </div>
+                </div>
+
+                <div class="stats-container">
+                    <div class="stat-group">
+                        <div class="stat-header">
+                            <span class="stat-title">HP (ЗДОРОВЬЕ)</span>
+                            <span class="stat-value hp" id="hp-txt">100/100</span>
+                        </div>
+                        <div class="hud-bar-bg">
+                            <div id="hp-fill" class="hud-bar-fill fill-hp"></div>
+                        </div>
+                    </div>
+
+                    <div class="stat-group">
+                        <div class="stat-header">
+                            <span class="stat-title">XP (ОПЫТ)</span>
+                            <span class="stat-value xp" id="xp-txt">0/1000</span>
+                        </div>
+                        <div class="hud-bar-bg">
+                            <div id="xp-fill" class="hud-bar-fill fill-xp"></div>
+                        </div>
+                    </div>
+
+                    <div class="stat-group">
+                        <div class="stat-header">
+                            <span class="stat-title">БАЛАНС КРИСТАЛЛОВ</span>
+                            <div class="crystal-display">
+                                <span class="stat-value orbitron crystal-count" id="crystal-txt">0</span>
+                                <div class="crystal-icon">
+                                    <span class="crystal-core"></span>
+                                    <span class="crystal-facet crystal-facet-left"></span>
+                                    <span class="crystal-facet crystal-facet-right"></span>
+                                    <span class="crystal-facet crystal-facet-bottom"></span>
+                                    <span class="crystal-inner-glow"></span>
+                                    <span class="crystal-spark"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hud-bar-bg">
+                            <div id="crystal-fill" class="hud-bar-fill fill-crystal"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="crystal-mini-info">
+                    <span id="daily-quest-progress">Дела сегодня: 0/8</span>
+                    <span id="daily-crystal-progress">Кристаллы сегодня: 0/140</span>
+                </div>
+
+                <div class="values-progress-card">
+                    <div class="values-progress-head">
+                        <span class="stat-title">ПРОГРЕСС ЦЕННОСТЕЙ</span>
+                    </div>
+                    <div id="values-progress" class="values-progress-grid"></div>
+                </div>
+            </div>
+
+            <div class="glass-card priority-task">
+                <div class="task-marker"></div>
+                <div class="task-info">
+                    <span class="stat-title">АКТУАЛЬНЫЙ ПРИОРИТЕТ</span>
+                    <p id="current-priority-task">Отбой строго до 21:00</p>
+                    <div class="schedule-widget">
+                        <span class="stat-title">ДО ОТБОЯ</span>
+                        <div id="bedtime-countdown" class="bedtime-countdown orbitron">00:00:00</div>
+                        <div id="night-status" class="night-status">Режим дня активен</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card motivation-card">
+                <div class="motivation-head">
+                    <span class="stat-header">СИСТЕМА МОТИВАЦИИ ГЕРОЯ</span>
+                    <span class="motivation-level orbitron" id="motivation-level">УРОВЕНЬ 1</span>
+                </div>
+                <div class="motivation-grid">
+                    <div class="motivation-item">
+                        <span class="motivation-label">НАГРАДА ЗА СЛЕД. УРОВЕНЬ</span>
+                        <p id="motivation-next-level">+25 💎 и восстановление HP</p>
+                    </div>
+                    <div class="motivation-item">
+                        <span class="motivation-label">СОСТОЯНИЕ HP</span>
+                        <p id="motivation-hp-state">Стабильный режим</p>
+                    </div>
+                    <div class="motivation-item">
+                        <span class="motivation-label">ЛЕСТНИЦА ПОСЛЕДСТВИЙ</span>
+                        <p id="motivation-penalty">Легкий -> Средний -> Жесткий</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-quests" class="tab-content">
+            <h3 class="orbitron section-title">ЖУРНАЛ МИССИЙ</h3>
+            <div id="quest-container" class="quest-list">
+                </div>
+        </section>
+
+        <section id="tab-store" class="tab-content">
+            <h3 class="orbitron section-title-store">МАГАЗИН ПРИЗОВ</h3>
+            
+            <div class="glass-card wheel-bonus-card">
+                <h4 class="orbitron">КОЛЕСО ПРИЗОВ</h4>
+                <div class="wheel-container wheel-container-bonus" id="bonus-wheel-wrap">
+                    <div class="wheel-ribbon-trail"></div>
+                    <div class="wheel-burst wheel-burst-fire"></div>
+                    <div class="wheel-burst wheel-burst-water"></div>
+                    <div class="wheel-arrow-bonus"></div>
+                    <canvas id="bonus-wheel" width="340" height="340"></canvas>
+                </div>
+                <button id="spin-bonus-btn" class="btn-action btn-spin-bonus" onclick="spinBonusWheel()">
+                    КРУТИТЬ КОЛЕСО (100 💎)
+                </button>
+                <div id="bonus-legend" class="wheel-legend wheel-legend-store"></div>
+            </div>
+
+            <div id="shop-container" class="grid-2">
+                </div>
+        </section>
+
+        <section id="tab-honesty" class="tab-content">
+            <h3 class="orbitron section-title">ПРОТОКОЛ ЧЕСТНОСТИ</h3>
+
+            <div class="glass-card honesty-protocol-card">
+                <div class="honesty-head">
+                    <span class="stat-header">ПРИЗНАНИЕ НАРУШЕНИЯ</span>
+                    <p>Выбери уровень признания и конкретное последствие. После отправки заявка уходит Мастеру во входящие.</p>
+                    <div id="honesty-risk-legend" class="honesty-risk-legend">
+                        <div class="honesty-risk-item light" data-level="light">
+                            <span class="honesty-risk-title">ЛЕГКИЙ</span>
+                            <span class="honesty-risk-meta">Здоровье: до 0 | Опыт: без потерь | Кристаллы: без потерь</span>
+                        </div>
+                        <div class="honesty-risk-item medium" data-level="medium">
+                            <span class="honesty-risk-title">СРЕДНИЙ</span>
+                            <span class="honesty-risk-meta">Здоровье: до 0 | Опыт: без потерь | Кристаллы: по условию</span>
+                        </div>
+                        <div class="honesty-risk-item hard" data-level="hard">
+                            <span class="honesty-risk-title">ЖЕСТКИЙ</span>
+                            <span class="honesty-risk-meta">Здоровье: до 0 | Опыт: по условию | Кристаллы: высокий риск</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="honesty-level-grid">
+                    <button class="btn-action honesty-level-btn" data-level="light" onclick="switchHonestyLevel('light')">ЛЕГКИЙ</button>
+                    <button class="btn-action honesty-level-btn" data-level="medium" onclick="switchHonestyLevel('medium')">СРЕДНИЙ</button>
+                    <button class="btn-action honesty-level-btn" data-level="hard" onclick="switchHonestyLevel('hard')">ЖЕСТКИЙ</button>
+                </div>
+
+                <div id="honesty-consequence-list" class="honesty-consequence-list"></div>
+
+                <div class="honesty-actions">
+                    <button id="honesty-submit-btn" class="btn-action btn-penalty" onclick="submitHonestyRequest()">ОТПРАВИТЬ НА ПРИЗНАНИЕ</button>
+                    <p id="honesty-request-status" class="honesty-request-status">Выберите уровень и последствие.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="tab-admin" class="tab-content">
+            <h3 class="orbitron section-title-admin">ТРОН ВЛАДЫКИ</h3>
+
+            <div class="glass-card dojo-mode-control">
+                <div class="dojo-mode-head">
+                    <span class="stat-header">ГЛОБАЛЬНЫЙ РЕЖИМ «ДОДЗЁ»</span>
+                    <p id="dojo-mode-caption" class="dojo-mode-caption">Активный режим: доступны База, Квесты, Магазин и Протокол честности.</p>
+                </div>
+                <button id="dojo-mode-toggle-btn" class="btn-action dojo-mode-toggle-btn open" onclick="toggleGlobalDojoMode()">ОТКРЫТО</button>
+                <div class="dojo-mode-log-wrap">
+                    <p class="dojo-mode-log-title">ЖУРНАЛ ОТКРЫТИЙ/ЗАКРЫТИЙ</p>
+                    <div id="dojo-mode-log" class="dojo-mode-log"></div>
+                </div>
+            </div>
+
+            <div class="glass-card admin-analytics-section">
+                <div class="admin-analytics-head">
+                    <span class="stat-header">АНАЛИТИКА НЕДЕЛИ</span>
+                </div>
+
+                <div class="admin-stats-grid">
+                    <div class="admin-stat-card stat-pending">
+                        <span class="admin-stat-label">ЗАДАЧ НА ПРОВЕРКЕ</span>
+                        <span id="admin-stat-pending" class="admin-stat-value">0</span>
+                    </div>
+                    <div class="admin-stat-card stat-approved">
+                        <span class="admin-stat-label">ПОДТВЕРЖДЕНО</span>
+                        <span id="admin-stat-approved" class="admin-stat-value">0</span>
+                    </div>
+                    <div class="admin-stat-card stat-rejected">
+                        <span class="admin-stat-label">ОТКЛОНЕНО</span>
+                        <span id="admin-stat-rejected" class="admin-stat-value">0</span>
+                    </div>
+                    <div class="admin-stat-card stat-issued">
+                        <span class="admin-stat-label">ВЫДАНО НАГРАД</span>
+                        <span id="admin-stat-issued" class="admin-stat-value">0</span>
+                    </div>
+                    <div class="admin-stat-card stat-hard">
+                        <span class="admin-stat-label">ЖЕСТКИЕ ШТРАФЫ</span>
+                        <span id="admin-stat-hard" class="admin-stat-value danger">0</span>
+                    </div>
+                    <div class="admin-stat-card stat-xp">
+                        <span class="admin-stat-label">ОПЫТ ЗА 7 ДНЕЙ</span>
+                        <span id="admin-stat-xp7" class="admin-stat-value accent">0</span>
+                    </div>
+                    <div class="admin-stat-card stat-honesty-total">
+                        <span class="admin-stat-label">ПРИЗНАНИЙ ВСЕГО</span>
+                        <span id="admin-stat-honesty-total" class="admin-stat-value">0</span>
+                    </div>
+                    <div class="admin-stat-card stat-honesty-light">
+                        <span class="admin-stat-label">ПРИЗНАНИЯ: ЛЕГКИЙ</span>
+                        <span id="admin-stat-honesty-light" class="admin-stat-value">0</span>
+                    </div>
+                    <div class="admin-stat-card stat-honesty-medium">
+                        <span class="admin-stat-label">ПРИЗНАНИЯ: СРЕДНИЙ</span>
+                        <span id="admin-stat-honesty-medium" class="admin-stat-value">0</span>
+                    </div>
+                    <div class="admin-stat-card stat-honesty-hard">
+                        <span class="admin-stat-label">ПРИЗНАНИЯ: ЖЕСТКИЙ</span>
+                        <span id="admin-stat-honesty-hard" class="admin-stat-value danger">0</span>
+                    </div>
+                </div>
+
+                <div class="admin-chart-wrap">
+                    <canvas id="admin-stats-chart" width="640" height="220"></canvas>
+                </div>
+            </div>
+            
+            <div class="glass-card admin-check-section">
+                <span class="stat-header">АЛТАРЬ СУДА</span>
+                <div id="admin-pending" class="quest-list">
+                    </div>
+            </div>
+
+            <div class="glass-card admin-crit-section">
+                <span class="stat-header glow-red-text">ПОДТВЕРЖДЕНИЕ НАКАЗАНИЙ</span>
+                <p class="admin-warning-p">Ручной запуск штрафов отключен. Наказания активируются только через подтверждение заявки из «Признания вины».</p>
+            </div>
+
+            <div class="glass-card admin-consequence-section">
+                <div class="admin-consequence-headline">
+                    <span class="stat-header">КОНТРОЛЬ ПОСЛЕДСТВИЙ</span>
+                    <p>Для каждого штрафа отметьте статус: сделал или не сделал.</p>
+                </div>
+                <div id="admin-consequences" class="quest-list"></div>
+            </div>
+
+            <div class="glass-card admin-reset-section">
+                <div class="admin-reset-headline">
+                    <span class="stat-header glow-red-text">ЭКСТРЕННЫЙ СБРОС АККАУНТА</span>
+                    <p>Используйте только в крайнем случае. Сброс очищает прогресс, уровни, кристаллы, активные протоколы и журнал событий.</p>
+                </div>
+                <button class="btn-action btn-reset-account" onclick="resetAccountToZero()">
+                    СБРОС АККАУНТА ДО НУЛЯ
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <nav class="bottom-dock orbitron">
+        <div class="nav-item active" onclick="switchTab('tab-dashboard', this)">БАЗА</div>
+        <div class="nav-item" onclick="switchTab('tab-quests', this)">КВЕСТЫ</div>
+        <div class="nav-item" onclick="switchTab('tab-store', this)">МАГАЗИН</div>
+        <div class="nav-item nav-honesty" onclick="switchTab('tab-honesty', this)"><span>ПРОТОКОЛ</span><span>ЧЕСТНОСТИ</span></div>
+        <div class="nav-item nav-admin" onclick="openAdmin()">МАСТЕР</div>
+    </nav>
+
+    <div id="rules-overlay" class="overlay" onclick="if(event.target===this) this.classList.remove('active')">
+        <div class="overlay-content rules-modal">
+            <h2 class="orbitron">ПРАВИЛА ДОДЗЁ</h2>
+            <p class="rules-intro"><b>Додзё</b> — это система прокачки самоконтроля. Ты двигаешься по шкале <b>«Путь от хаоса к порядку»</b>, а каждая честная победа укрепляет прогресс.</p>
+
+            <div class="rules-legend-block">
+                <h3 class="orbitron rules-accent">РЕСУРСЫ И БАЗОВАЯ ЛОГИКА</h3>
+                <ul class="rules-detail-list">
+                    <li><b>XP</b> — опыт за подтвержденные полезные действия. Каждые 1000 XP поднимают уровень.</li>
+                    <li><b>HP</b> — запас устойчивости. При падении до 0 активируется штрафной протокол.</li>
+                    <li><b>Кристаллы</b> — валюта Додзё для магазина и колеса наград.</li>
+                    <li><b>Щиты</b> — защита от части урона и мягких срывов. Если щита нет, урон уходит в HP.</li>
+                </ul>
+            </div>
+
+            <div class="rules-legend-block">
+                <h3 class="orbitron rules-accent">УРОВНИ ПРОТОКОЛА ЧЕСТНОСТИ</h3>
+                <ul class="rules-detail-list">
+                    <li><b>Легкий</b>: единичный срыв, импульсивная ошибка. Обычно мягкое последствие и дисциплинарный откат.</li>
+                    <li><b>Средний</b>: повторяемая ошибка или осознанный уход от задачи. Последствие строже, восстановление дольше.</li>
+                    <li><b>Жесткий</b>: ложь, саботаж или сознательное нарушение доверия. Применяется фиксированное тяжелое наказание.</li>
+                    <li><b>Важно</b>: наказание запускается только после подтверждения Мастером заявки из «Признания вины».</li>
+                </ul>
+            </div>
+
+            <div class="rules-legend-block">
+                <h3 class="orbitron rules-accent">ПУТЬ ОТ ХАОСА К ПОРЯДКУ</h3>
+                <p>Шкала состоит из 20 ступеней. Каждая побежденная привычка и подтвержденный квест продвигают тебя вперед. Нарушения и отклоненные подтверждения могут откатывать прогресс назад.</p>
+                <ul class="rules-detail-list">
+                    <li><b>1-5</b>: База — стабилизация режима.</li>
+                    <li><b>6-10</b>: Фокус — развитие дисциплины.</li>
+                    <li><b>11-15</b>: Контроль — удержание результата под нагрузкой.</li>
+                    <li><b>16-20</b>: Мастерство — устойчивый порядок без срывов.</li>
+                </ul>
+            </div>
+
+            <div class="rules-legend-block">
+                <h3 class="orbitron rules-accent">МАСТЕР-ПРОВЕРКА</h3>
+                <ul class="rules-detail-list">
+                    <li>Любой квест сначала попадает во входящие к Мастеру.</li>
+                    <li>До подтверждения награда и прогресс не начисляются.</li>
+                    <li>Отклоненные задачи можно исправить и отправить заново.</li>
+                    <li>По последствиям Мастер отмечает статус «сделано / не сделано».</li>
+                </ul>
+            </div>
+
+            <div class="rules-legend-block">
+                <h3 class="orbitron rules-accent">ЭКОНОМИКА И НАГРАДЫ</h3>
+                <ul class="rules-detail-list">
+                    <li>Кристаллы зарабатываются только через реальные подтвержденные действия.</li>
+                    <li>Колесо и магазин работают по ограничениям системы, чтобы сохранить честный прогресс.</li>
+                    <li>Итоговая цель — не быстрый фарм, а стабильный рост дисциплины.</li>
+                </ul>
+            </div>
+
+            <hr>
+            <h3 class="orbitron rules-accent">СЕКРЕТ АНТИ-МУХЛЕЖА</h3>
+            <p>Система отслеживает подозрительную частоту действий, дубли отправок и аномальную скорость прогресса. Если подтверждения выглядят как накрутка, Мастер может отклонить заявку без начисления награды.</p>
+            <button class="btn-action btn-confirm rules-confirm" onclick="document.getElementById('rules-overlay').classList.remove('active');">ПОНЯТНО</button>
+        </div>
+    </div>
+
+    <div id="celebration-overlay" class="overlay celebration-overlay" onclick="if(event.target===this) closeCelebration()">
+        <div class="overlay-content celebration-modal">
+            <div class="celebration-core" id="celebration-core"></div>
+            <h2 class="orbitron" id="celebration-title">ПОБЕДА!</h2>
+            <p id="celebration-text">Награда получена</p>
+            <div id="celebration-meta" class="celebration-meta"></div>
+            <div id="celebration-particles" class="celebration-particles"></div>
+            <button class="btn-action btn-confirm rules-confirm" onclick="closeCelebration()">КРУТО</button>
+        </div>
+    </div>
+
+    <script type="module" src="script.js?v=20260417v43"></script>
+    <script>
+        // Lightweight cleanup: unregister legacy service workers in background only.
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function () {
+                navigator.serviceWorker
+                    .getRegistrations()
+                    .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+                    .catch(() => {});
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+.screen {
+  display: none;
+}
+
+.screen.active {
+  display: block;
+}
+
+.screen-title {
+  margin-bottom: var(--space-4);
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

@@ -1,0 +1,37 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  font-family: "Roboto", sans-serif !important;
+  color: var(--text-main);
+  background-color: var(--bg-dark);
+  background-image:
+    radial-gradient(circle at 12% -6%, rgba(72, 156, 214, 0.2) 0%, transparent 40%),
+    radial-gradient(circle at 88% 2%, rgba(38, 86, 144, 0.18) 0%, transparent 42%),
+    linear-gradient(180deg, #0a1328 0%, #08101f 40%, #070a14 100%);
+}
+
+.hidden {
+  display: none !important;
+}
+
+@keyframes pulseGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 12px var(--neon-fire-glow);
+  }
+  50% {
+    box-shadow: 0 0 28px var(--neon-fire-glow);
+  }
+}

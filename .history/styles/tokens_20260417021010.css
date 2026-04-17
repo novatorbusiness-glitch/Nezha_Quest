@@ -1,0 +1,30 @@
+:root {
+  --bg-dark: #070a14;
+  --bg-card: rgba(10, 20, 45, 0.58);
+  --border-color: rgba(118, 205, 255, 0.28);
+
+  --text-main: #e2e8f0;
+  --text-muted: #64748b;
+
+  --neon-hp: #ff2a55;
+  --neon-hp-glow: rgba(255, 42, 85, 0.4);
+
+  --neon-xp: #00ffcc;
+  --neon-xp-glow: rgba(0, 255, 204, 0.4);
+
+  --neon-crystal: #00b7ff;
+  --neon-crystal-glow: rgba(0, 183, 255, 0.4);
+
+  --neon-fire: #ff5a00;
+  --neon-fire-glow: rgba(255, 90, 0, 0.45);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+
+  --glass-radius: 24px;
+  --glass-blur: 20px;
+  --glass-border-glow: rgba(118, 205, 255, 0.22);
+}

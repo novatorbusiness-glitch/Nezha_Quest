@@ -1,0 +1,33 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  font-family: "Inter", sans-serif !important;
+  color: var(--text-main);
+  background: var(--bg-dark);
+}
+
+.hidden {
+  display: none !important;
+}
+
+@keyframes pulseGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 12px var(--neon-fire-glow);
+  }
+  50% {
+    box-shadow: 0 0 28px var(--neon-fire-glow);
+  }
+}
